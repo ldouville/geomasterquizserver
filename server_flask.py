@@ -7,13 +7,13 @@ from controller import Controller
 
 app = create_app()
 app.app_context().push()
-controller = Controller()
-countries = Country.query.all()
-clist = countries[:4]
 
 @app.shell_context_processor
 def make_shell_context():
-	return {
+    controller = Controller()
+    countries = Country.query.all()
+    clist = countries[:4]
+    return {
         'db': db,
         'scraper': scraper,
         'controller': controller,
@@ -23,4 +23,4 @@ def make_shell_context():
         'Question': Question,
         'clist': clist,
         'countries': countries,
-        }
+    }
