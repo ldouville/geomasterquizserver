@@ -46,11 +46,15 @@ class Controller(object):
         else:
             print("There is no differences to apply")
 
-    def generate_new_questions(self, type, questions_per_country):
+    def generate_new_questions(self, type, questions_per_country, commit=True):
         for country in Country.query.all():
             for question in country.generate_questions(type, questions_per_country):
-                db.session.add(question)
-        db.session.commit()
+                if commit:
+                    db.session.add(question)
+                else:
+                    print(question)
+        if commit:
+            db.session.commit()
 
 
 
