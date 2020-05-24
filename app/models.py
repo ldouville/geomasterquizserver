@@ -1,10 +1,9 @@
 from datetime import datetime
+import random
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
 from app import db, login
-import lib
-
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -46,13 +45,25 @@ class Country(db.Model):
     population = db.Column(db.Integer)
     questions = db.relationship("Question", backref="right_answer", lazy="dynamic")
 
+    def get_ordered_random_numbers(self, nb_max, forbidden_numbers, quantity=3):
+        #TODO get this funciton out of the class to use is everywhere (if needed)
+        if type(forbidden_numbers) is int:
+            forbidden_numbers = [forbidden_numbers]
+        random_numbers = []
+        while len(random_numbers)  < quantity:
+            x = random.randrange(1, nb_max + 1)
+            if x not in forbidden_numbers + random_numbers:
+                random_numbers.append(x)
+        random_numbers.sort()
+        return random_numbers
+
     def generate_questions(self, type, nb_of_questions):
         questions = []
         previous_questions = self.questions.all()
         all_countries = Country.query.all()
         id_max = max(c.id for c in all_countries)
         while len(questions) < nb_of_questions:
-            random_numbers = lib.get_ordered_random_numbers(id_max, self.id)
+            random_numbers = self.get_ordered_random_numbers(id_max, self.id)
             answers = []
             for x in random_numbers:
                 answer = next(c for c in all_countries if c.id == x)
